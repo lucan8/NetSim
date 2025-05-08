@@ -8,8 +8,8 @@ import java.util.Map;
 
 import db_conn.DBConn;
 public abstract class Model{
-    private final String table_name;
-    private final Integer id;
+    protected final String table_name;
+    protected final Integer id;
 
     public Model(String table_name, Integer id){
         this.table_name = table_name;
@@ -23,8 +23,12 @@ public abstract class Model{
     public Integer getId() {
         return id;
     }
-
-    public boolean insert(HashMap<String, Object> col_val_map) throws SQLException{
+    
+    public abstract boolean create() throws SQLException;
+    public abstract boolean insert() throws SQLException;
+    
+    
+    protected boolean insert(HashMap<String, Object> col_val_map) throws SQLException{
         StringBuilder columns = new StringBuilder(),
                       placeholders = new StringBuilder();
         String sep = ", ";
@@ -42,16 +46,17 @@ public abstract class Model{
         placeholders.setLength(placeholders.length() - sep.length());
 
         // Create and execute parameterized query
-        String query = String.format("INSERT INTO %s (%s) VALUES(%s)", table_name, columns, placeholders);
+        String query = String.format("INSERT INTO %s (%s) VALUES(%s);", table_name, columns, placeholders);
+        System.out.println(query);
         try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
 
-            return stmt.executeUpdate(query) > 0;
+            return stmt.executeUpdate() > 0;
         }
     }
 
-    public boolean delete(HashMap<String, Object> where_cond) throws SQLException{
+    protected boolean delete(HashMap<String, Object> where_cond) throws SQLException{
         StringBuilder where_str = new StringBuilder();
         String sep = " AND ";
         ArrayList<Object> parameters = new ArrayList();
@@ -75,7 +80,7 @@ public abstract class Model{
         }
     }
 
-    public boolean update(HashMap<String, Object> col_val_map, HashMap<String, Object> where_cond) throws SQLException{
+    protected boolean update(HashMap<String, Object> col_val_map, HashMap<String, Object> where_cond) throws SQLException{
         StringBuilder update_str = new StringBuilder(),
                       where_str = new StringBuilder();
         String update_sep = ", ";
@@ -108,7 +113,7 @@ public abstract class Model{
         }
     }
 
-    public ResultSet select(ArrayList<String> col_list, HashMap<String, Object> where_cond) throws SQLException{
+    protected ResultSet select(ArrayList<String> col_list, HashMap<String, Object> where_cond) throws SQLException{
         StringBuilder where_str = new StringBuilder();
         String col_str = String.join(", ", col_list);
         String sep = " AND ";
