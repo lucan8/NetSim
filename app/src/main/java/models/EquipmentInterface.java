@@ -1,0 +1,85 @@
+package models;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import static java.util.Map.entry;
+
+import db_conn.DBConn;
+public class EquipmentInterface extends Model { // Renamed from EquipmentInterfaceModel
+    private String ip;
+    private final String mac_addr;
+    private Integer mask;
+    private final Integer equipment_id;
+
+    // New default constructor
+    public EquipmentInterface() {
+        super("EquipmentInterface", null);
+        this.ip = null;
+        this.mac_addr = null;
+        this.mask = null;
+        this.equipment_id = null;
+    }
+
+    public EquipmentInterface(Integer id, String ip, String mac_addr, Integer mask, Integer equipment_id) {
+        super("EquipmentInterface", id);
+        this.ip = ip;
+        this.mac_addr = mac_addr;
+        this.mask = mask;
+        this.equipment_id = equipment_id;
+    }
+
+    @Override
+    public boolean create() throws SQLException{
+        String query = String.format("""
+        CREATE TABLE IF NOT EXISTS %s(
+            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            ip VARCHAR(20) NOT NULL,
+            mac_addr VARCHAR(20) NOT NULL UNIQUE,
+            mask INTEGER NOT NULL,
+            equipment_id INTEGER NOT NULL,
+
+            FOREIGN KEY(equipment_id) REFERENCES equipment(id) 
+        );
+        """, this.table_name);
+        
+        System.out.println(query);
+        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+            stmt.executeUpdate(query);
+            return true;
+        }
+    }
+    
+    @Override
+    public boolean insert() throws SQLException {
+        return super.insert(new HashMap(Map.ofEntries(
+                entry("ip", this.ip),
+                entry("mac_addr", this.mac_addr),
+                entry("mask", this.mask),
+                entry("equipment_id", this.equipment_id)
+        )));
+    }
+    public String getIp() {
+        return ip;
+    }
+
+    public String getMac_addr() {
+        return mac_addr;
+    }
+
+    public Integer getMask() {
+        return mask;
+    }
+
+    public Integer getEquipmentId() {
+        return equipment_id;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setMask(Integer mask) {
+        this.mask = mask;
+    }
+}
