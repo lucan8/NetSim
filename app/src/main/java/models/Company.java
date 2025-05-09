@@ -6,10 +6,9 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 import db_conn.DBConn;
-public class Company extends Model { // Renamed from CompanyModel
+public class Company extends Model {
     private String name;
 
-    // New default constructor
     public Company() {
         super("Company", null);
         this.name = null;
@@ -43,6 +42,12 @@ public class Company extends Model { // Renamed from CompanyModel
             entry("name", this.name)
         )));
     }
+
+    @Override
+    public void print(){
+        return;
+    }    
+    
     public String getName() {
         return name;
     }

@@ -6,7 +6,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 import db_conn.DBConn;
-public class Equipment extends Model { // Renamed from EquipmentModel
+public class Equipment extends Model {
     public enum EquipmentType {
         ROUTER,
         SWITCH,
@@ -18,7 +18,6 @@ public class Equipment extends Model { // Renamed from EquipmentModel
     protected final Integer company_id;
     protected final String type;
 
-    // New default constructor
     public Equipment() {
         super("Equipment", null);
         this.name = null;
@@ -65,7 +64,13 @@ public class Equipment extends Model { // Renamed from EquipmentModel
                 entry("company_id", this.company_id),
                 entry("type", this.type)
         )));
-    }   
+    }  
+
+    @Override
+    public void print(){
+        return;
+    }    
+     
     // abstract public void forwardPacket(PacketModel packet, EquipmentInterfaceModel equipmentInterface);
 
     public String getName() {

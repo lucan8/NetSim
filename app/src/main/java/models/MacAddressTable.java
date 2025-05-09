@@ -9,8 +9,6 @@ public class MacAddressTable extends Model{
     private final Integer interface_id;
     private final String mac_address;
 
-    
-    // New default constructor
     public MacAddressTable() {
         super("MacAddressTable", null);
         this.switch_id = null;
@@ -36,6 +34,12 @@ public class MacAddressTable extends Model{
                 entry("mac_address", this.mac_address)
         )));
     }
+
+    @Override
+    public void print(){
+        return;
+    }    
+    
     public Integer getSwitchId(){
         return switch_id;
     }

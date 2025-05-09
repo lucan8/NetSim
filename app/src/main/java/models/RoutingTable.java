@@ -41,6 +41,12 @@ public class RoutingTable extends Model{
                 entry("interface_id", this.interface_id)
         )));
     }
+
+    @Override
+    public void print(){
+        return;
+    }    
+    
     public Integer getRouterId(){
         return router_id;
     }
