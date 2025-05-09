@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import static java.util.Map.entry;
 
 import db_conn.DBConn;
 public abstract class Model{
@@ -26,8 +27,15 @@ public abstract class Model{
     
     public abstract boolean create() throws SQLException;
     public abstract boolean insert() throws SQLException;
+    public abstract void print();
     
-    
+    public ResultSet selectById(Integer id) throws SQLException{
+        return this.select(null, 
+                           new HashMap(Map.ofEntries(
+                                    entry("id", id)
+                                    ))
+                          );
+    }
     protected boolean insert(HashMap<String, Object> col_val_map) throws SQLException{
         StringBuilder columns = new StringBuilder(),
                       placeholders = new StringBuilder();
@@ -46,7 +54,7 @@ public abstract class Model{
         placeholders.setLength(placeholders.length() - sep.length());
 
         // Create and execute parameterized query
-        String query = String.format("INSERT INTO %s (%s) VALUES(%s);", table_name, columns, placeholders);
+        String query = String.format("INSERT INTO %s (%s) VALUES(%s)", table_name, columns, placeholders);
         System.out.println(query);
         try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
@@ -115,7 +123,12 @@ public abstract class Model{
 
     protected ResultSet select(ArrayList<String> col_list, HashMap<String, Object> where_cond) throws SQLException{
         StringBuilder where_str = new StringBuilder();
-        String col_str = String.join(", ", col_list);
+        
+        // Default selects everything
+        String col_str = "*";
+        if (col_list != null)
+            col_str = String.join(", ", col_list);
+
         String sep = " AND ";
         ArrayList<Object> parameters = new ArrayList<>();
 
@@ -127,6 +140,7 @@ public abstract class Model{
         where_str.setLength(where_str.length() - sep.length());
         String query = String.format("SELECT %s FROM %s WHERE %s", col_str, table_name, where_str);
 
+        System.out.println(query);
         try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
