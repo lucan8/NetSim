@@ -2,7 +2,7 @@ package models;
 
 public class Router extends Equipment {
     public Router() {
-        super(); // Calls Equipment's default constructor
+        super();
     }
 
     public Router(Integer id, String name, Integer max_interface_count, Integer company_id) {
