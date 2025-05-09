@@ -2,9 +2,11 @@ package db_conn;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import models.Company;
 import models.Equipment;
 import models.EquipmentInterface;
+import models.Packet;
 public class DBConn{
     private static Connection instance = null;
     private DBConn(){}
@@ -45,6 +47,12 @@ public class DBConn{
     
         EquipmentInterface equipment_interface = new EquipmentInterface();
         equipment_interface.create();
+
+        models.Connection connection = new models.Connection();
+        connection.create();
+
+        Packet packet = new Packet();
+        packet.create();
     }   
 
     public static boolean TestConn() throws SQLException{
