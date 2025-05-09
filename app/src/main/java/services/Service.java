@@ -6,20 +6,21 @@ import static java.util.Map.entry;
 import java.util.Scanner;
 
 import models.Company;
+import models.Connection;
 import models.Equipment;
 import models.EquipmentInterface;
 import models.Host;
+import models.Packet;
 import models.Router;
 import models.Switch;
-
 public class Service{
     private static Scanner scanner = new Scanner(System.in);
     private static final Map<Integer, Runnable> menu_choices = Map.ofEntries(
             entry(1, Service::addCompany),
             entry(2, Service::addEquipment),
             entry(3, Service::addEquipmentInterface),
-            // entry(4, Service::addConnection),
-            // entry(5, Service::addPacket),
+            entry(4, Service::addConnection),
+            entry(5, Service::addPacket),
             // entry(6, Service::listEquipmentInterfaces),
             // entry(7, Service::listNetwork),
             // entry(8, Service::listPackets),
@@ -154,10 +155,97 @@ public class Service{
 
         System.out.println("Equipment interface added successfully");
     }
-    // public static void addConnection();
-    // public static void addPacket();
 
-    // public static void listEquipmentInterfaces();
+    public static void addConnection(){
+        System.out.println("Enter equipment interface ID 1: ");
+        Integer equipment_interface_id_1 = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter equipment interface ID 2: ");
+        Integer equipment_interface_id_2 = scanner.nextInt();
+        scanner.nextLine();
+
+        // Create connection object
+        Connection connection = new Connection(0, equipment_interface_id_1, equipment_interface_id_2);
+
+        // Insert the connection into the database
+        boolean res;
+        try {
+            res = connection.insert();
+        } catch (SQLException e) {
+            System.out.println("Error adding connection: " + e.getMessage());
+            return;
+        }
+
+        // Check if the insertion was successful
+        if (!res) {
+            System.out.println("Error adding connection: Failed to insert into database");
+            return;
+        }
+
+        System.out.println("Connection added successfully");
+    }
+    public static void addPacket(){
+        System.out.println("Enter packet connection: ");
+        Integer connection_id = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter packet source ip: ");
+        String src_ip = scanner.nextLine();
+        
+        System.out.println("Enter packet destination ip: ");
+        String dest_ip = scanner.nextLine();
+        
+        System.out.println("Enter packet source mac address: ");
+        String src_mac = scanner.nextLine();
+        
+        System.out.println("Enter packet destination mac address: ");
+        String dest_mac = scanner.nextLine();
+
+        System.out.println("Enter packet data: ");
+        String data = scanner.nextLine();
+
+        // Create packet object
+        Packet packet = new Packet(0, connection_id, src_ip, dest_ip, src_mac, dest_mac, data);
+
+        // Insert the packet into the database
+        boolean res;
+        try {
+            res = packet.insert();
+        } catch (SQLException e) {
+            System.out.println("Error adding packet: " + e.getMessage());
+            return;
+        }
+
+        // Check if the insertion was successful
+        if (!res) {
+            System.out.println("Error adding packet: Failed to insert into database");
+            return;
+        }
+
+        System.out.println("Packet added successfully");
+    }
+
+    // public static void listEquipmentInterfaces(){
+    //     System.out.println("Equipment id: ");
+    //     Integer equipment_id = scanner.nextInt();
+    //     scanner.nextLine();
+
+    //     EquipmentInterface eq_interface = new EquipmentInterface();
+    //     List<EquipmentInterface> eq_interfaces;
+    //     try {
+    //         eq_interfaces = eq_interface.selectByEquipment(equipment_id);
+    //     } catch (SQLException e) {
+    //         System.out.println("Error retrieving equipment interfaces: " + e.getMessage());
+    //         return;
+    //     }
+
+    //     System.out.println("Equipment " + equipment_id.toString() + " interfaces: ");
+        
+    //     for (var curr : eq_interfaces)
+    //         curr.print();
+
+    // }
     // public static void listNetwork();
     // public static void listPackets();
     // public static void listConnections();
@@ -167,8 +255,8 @@ public class Service{
         System.out.println("1. Add company");
         System.out.println("2. Add equipment");
         System.out.println("3. Add equipment interface");
-        // System.out.println("4. Add connection");
-        // System.out.println("5. Add packet");
+        System.out.println("4. Add connection");
+        System.out.println("5. Add packet");
         // System.out.println("6. List equipment interfaces");
         // System.out.println("7. List network");
         // System.out.println("8. List packets");
