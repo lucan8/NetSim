@@ -6,13 +6,13 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 import db_conn.DBConn;
-public class EquipmentInterface extends Model { // Renamed from EquipmentInterfaceModel
+
+public class EquipmentInterface extends Model {
     private String ip;
     private final String mac_addr;
     private Integer mask;
     private final Integer equipment_id;
 
-    // New default constructor
     public EquipmentInterface() {
         super("EquipmentInterface", null);
         this.ip = null;
@@ -59,6 +59,35 @@ public class EquipmentInterface extends Model { // Renamed from EquipmentInterfa
                 entry("equipment_id", this.equipment_id)
         )));
     }
+
+    // Selects all interfaces for the given equipment id
+    // public List<EquipmentInterface> selectByEquipment(Integer equipment_id) throws SQLException{
+    //     ResultSet result = super.select(null, new HashMap(Map.ofEntries(
+    //         entry("equipment_id", equipment_id)
+    //     )));
+
+
+    //     List<EquipmentInterface> interfaces = new java.util.ArrayList<>();
+    //     while (result.next()){
+    //         interfaces.add(new EquipmentInterface(
+    //             result.getInt("id"),
+    //             result.getString("ip"),
+    //             result.getString("mac_addr"),
+    //             result.getInt("mask"),
+    //             result.getInt("equipment_id")
+    //         ));
+    //         System.out.println("id: " + result.getInt("id"));
+    //     }
+    //     return interfaces;
+    // }
+
+    @Override
+    public void print(){
+        System.out.println("id: " + this.id);
+        System.out.println("ip: " + this.ip + "/" + this.mask);
+        System.out.println("mac_addr: " + this.mac_addr);
+    }    
+    
     public String getIp() {
         return ip;
     }
