@@ -1,38 +1,25 @@
 package models;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import static java.util.Map.entry;
 
 import db_conn.DBConn;
-public class Equipment extends Model {
-    public enum EquipmentType {
-        ROUTER,
-        SWITCH,
-        HOST
+import models_data.EquipmentData;
+
+public class Equipment extends Model<EquipmentData> {
+    public Equipment(){
+        super("Equipment");
     }
 
-    protected final String name;
-    protected final Integer max_interface_count;
-    protected final Integer company_id;
-    protected final String type;
-
-    public Equipment() {
-        super("Equipment", null);
-        this.name = null;
-        this.max_interface_count = null;
-        this.company_id = null;
-        this.type = null;
-    }
-
-    public Equipment(Integer id, String name, Integer max_interface_count, Integer company_id,
-                     EquipmentType type) {
-        super("Equipment", id);
-        this.name = name;
-        this.max_interface_count = max_interface_count;
-        this.company_id = company_id;
-        this.type = type.toString();
+    @Override
+    protected EquipmentData mapRowToEntity(ResultSet res) throws SQLException{
+        return new EquipmentData(
+            res.getInt("id"),
+            res.getString("name"),
+            res.getInt("max_interface_count"),
+            res.getInt("company_id"),
+            EquipmentData.EquipmentType.fromString(res.getString("type"))
+        );
     }
 
     @Override
@@ -55,37 +42,8 @@ public class Equipment extends Model {
             return true;
         }
     }
-
-    @Override
-    public boolean insert() throws SQLException {
-        return super.insert(new HashMap(Map.ofEntries(
-                entry("name", this.name),
-                entry("max_interface_count", this.max_interface_count),
-                entry("company_id", this.company_id),
-                entry("type", this.type)
-        )));
-    }  
-
-    @Override
-    public void print(){
-        return;
-    }    
      
     // abstract public void forwardPacket(PacketModel packet, EquipmentInterfaceModel equipmentInterface);
 
-    public String getName() {
-        return name;
-    }
 
-    public Integer getMaxInterfaceCount() {
-        return max_interface_count;
-    }
-
-    public Integer getCompanyId() {
-        return company_id;
-    }
-
-    public String getType() {
-        return type;
-    }
 }

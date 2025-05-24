@@ -1,22 +1,22 @@
 package models;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import static java.util.Map.entry;
 
 import db_conn.DBConn;
-public class Company extends Model {
-    private String name;
+import models_data.CompanyData;
 
+public class Company extends Model<CompanyData> {
     public Company() {
-        super("Company", null);
-        this.name = null;
+        super("Company");
     }
-    
-    public Company(Integer id, String name) {
-        super("Company", id);
-        this.name = name;
+
+    @Override
+    protected CompanyData mapRowToEntity(ResultSet res) throws SQLException{
+        return new CompanyData(
+            res.getInt("id"),
+            res.getString("name")
+        );
     }
 
     @Override
@@ -34,25 +34,5 @@ public class Company extends Model {
             stmt.executeUpdate(query);
             return true;
         }
-    }
-
-    @Override
-    public boolean insert() throws SQLException{
-        return super.insert(new HashMap<>(Map.ofEntries(
-            entry("name", this.name)
-        )));
-    }
-
-    @Override
-    public void print(){
-        return;
-    }    
-    
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

@@ -2,41 +2,27 @@ package models;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
-public class Packet extends Model{
-    // The connection the packet passed through
-    private final Integer connection_id;
-    
-    private final String src_ip_addr;
-    private final String dest_ip_addr;
-
-    private final String src_mac_addr;
-    private final String dest_mac_addr;
-
-    // Keeping the data as a string for now
-    private final String data;
-
-    public Packet() {
-        super("Packet", null);
-        this.connection_id = null;
-        this.src_ip_addr = null;
-        this.dest_ip_addr = null;
-        this.src_mac_addr = null;
-        this.dest_mac_addr = null;
-        this.data = null;
+import models_data.PacketData;
+public class Packet extends Model<PacketData>{
+    public Packet(){
+        super("Packet");
     }
 
-    public Packet(Integer id, Integer connection_id, String src_ip_addr, String dest_ip_addr,
-                       String src_mac_addr, String dest_mac_addr, String data){
-        super("Packet", id);
-        this.connection_id = connection_id;
-        this.src_ip_addr = src_ip_addr;
-        this.dest_ip_addr = dest_ip_addr;
-        this.src_mac_addr = src_mac_addr;
-        this.dest_mac_addr = dest_mac_addr;
-        this.data = data;
+    @Override
+    protected PacketData mapRowToEntity(ResultSet res) throws SQLException{
+        return new PacketData(
+            res.getInt("id"),
+            res.getInt("connection_id"),
+            res.getString("src_ip_addr"),
+            res.getString("dest_ip_addr"),
+            res.getString("src_mac_addr"),
+            res.getString("dest_mac_addr"),
+            res.getString("data")
+        );
     }
 
     @Override
@@ -51,7 +37,11 @@ public class Packet extends Model{
             dest_mac_addr VARCHAR(20) NOT NULL,
             data TEXT NOT NULL,
 
-            FOREIGN KEY(connection_id) REFERENCES Connection(id)
+            FOREIGN KEY(connection_id) REFERENCES Connection(id),
+            FOREIGN KEY(src_ip_addr) REFERENCES EquipmentInterface(ip),
+            FOREIGN KEY(dest_ip_addr) REFERENCES EquipmentInterface(ip),
+            FOREIGN KEY(src_mac_addr) REFERENCES EquipmentInterface(mac_addr),
+            FOREIGN KEY(dest_mac_addr) REFERENCES EquipmentInterface(mac_addr),
         );
         """ ,this.table_name);
         
@@ -62,44 +52,4 @@ public class Packet extends Model{
         }
     }
 
-    @Override
-    public boolean insert() throws SQLException{
-        return super.insert(new HashMap(Map.ofEntries(
-                entry("connection_id", this.connection_id),
-                entry("src_ip_addr", this.src_ip_addr),
-                entry("dest_ip_addr", this.dest_ip_addr),
-                entry("src_mac_addr", this.src_mac_addr),
-                entry("dest_mac_addr", this.dest_mac_addr),
-                entry("data", this.data)
-        )));
-    }
-
-    @Override
-    public void print(){
-        return;
-    }    
-    
-    public String getSrcIpAddr(){
-        return src_ip_addr;
-    }
-
-    public String getDestIpAddr(){
-        return dest_ip_addr;
-    }
-
-    public String getSrcMacAddr(){
-        return src_mac_addr;
-    }
-
-    public String getDestMacAddr(){
-        return dest_mac_addr;
-    }
-
-    public String getData(){
-        return data;
-    }
-
-    public Integer getConnectionId(){
-        return connection_id;
-    }
 }
