@@ -1,28 +1,16 @@
 package models;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import static java.util.Map.entry;
 
 import db_conn.DBConn;
+import models_data.ConnectionData;
 
-public class Connection extends Model {
-    private final Integer interface_id1;
-    private final Integer interface_id2;
-
-    public Connection() {
-        super("Connection", null);
-        this.interface_id1 = null;
-        this.interface_id2 = null;
+public class Connection extends Model<ConnectionData> {
+    public Connection(){
+        super("Connection");
     }
-
-    public Connection(Integer id, Integer interface_id1, Integer interface_id2) {
-        super("Connection", id);
-        this.interface_id1 = interface_id1;
-        this.interface_id2 = interface_id2;
-    }
-
+    
     @Override
     public boolean create() throws SQLException{
         String query = String.format("""
@@ -44,22 +32,11 @@ public class Connection extends Model {
     }
 
     @Override
-    public boolean insert() throws SQLException{
-        return super.insert(new HashMap(Map.ofEntries(
-            entry("interface_id1", this.interface_id1),
-            entry("interface_id2", this.interface_id2)
-        )));
-    }
-
-    @Override
-    public void print(){
-        return;
-    }    
-    public Integer getInterfaceId1() {
-        return interface_id1;
-    }
-
-    public Integer getInterfaceId2() {
-        return interface_id2;
+    protected ConnectionData mapRowToEntity(ResultSet res) throws SQLException{
+        return new ConnectionData(
+            res.getInt("id"),
+            res.getInt("interface_id1"),
+            res.getInt("interface_id2")
+        );
     }
 }

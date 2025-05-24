@@ -1,32 +1,25 @@
 package models;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import static java.util.Map.entry;
 
 import db_conn.DBConn;
+import models_data.EquipmentInterfaceData;
 
-public class EquipmentInterface extends Model {
-    private String ip;
-    private final String mac_addr;
-    private Integer mask;
-    private final Integer equipment_id;
-
-    public EquipmentInterface() {
-        super("EquipmentInterface", null);
-        this.ip = null;
-        this.mac_addr = null;
-        this.mask = null;
-        this.equipment_id = null;
+public class EquipmentInterface extends Model<EquipmentInterfaceData> {
+    public EquipmentInterface(){
+        super("EquipmentInterface");
     }
-
-    public EquipmentInterface(Integer id, String ip, String mac_addr, Integer mask, Integer equipment_id) {
-        super("EquipmentInterface", id);
-        this.ip = ip;
-        this.mac_addr = mac_addr;
-        this.mask = mask;
-        this.equipment_id = equipment_id;
+    
+    @Override
+    protected EquipmentInterfaceData mapRowToEntity(ResultSet res) throws SQLException{
+        return new EquipmentInterfaceData(
+            res.getInt("id"),
+            res.getString("ip"),
+            res.getString("mac_address"),
+            res.getInt("mask"),
+            res.getInt("equipment_id")
+        );
     }
 
     @Override
@@ -34,7 +27,7 @@ public class EquipmentInterface extends Model {
         String query = String.format("""
         CREATE TABLE IF NOT EXISTS %s(
             id INTEGER PRIMARY KEY AUTO_INCREMENT,
-            ip VARCHAR(20) NOT NULL,
+            ip VARCHAR(20) NOT NULL UNIQUE,
             mac_addr VARCHAR(20) NOT NULL UNIQUE,
             mask INTEGER NOT NULL,
             equipment_id INTEGER NOT NULL,
@@ -50,15 +43,6 @@ public class EquipmentInterface extends Model {
         }
     }
     
-    @Override
-    public boolean insert() throws SQLException {
-        return super.insert(new HashMap(Map.ofEntries(
-                entry("ip", this.ip),
-                entry("mac_addr", this.mac_addr),
-                entry("mask", this.mask),
-                entry("equipment_id", this.equipment_id)
-        )));
-    }
 
     // Selects all interfaces for the given equipment id
     // public List<EquipmentInterface> selectByEquipment(Integer equipment_id) throws SQLException{
@@ -81,34 +65,5 @@ public class EquipmentInterface extends Model {
     //     return interfaces;
     // }
 
-    @Override
-    public void print(){
-        System.out.println("id: " + this.id);
-        System.out.println("ip: " + this.ip + "/" + this.mask);
-        System.out.println("mac_addr: " + this.mac_addr);
-    }    
     
-    public String getIp() {
-        return ip;
-    }
-
-    public String getMac_addr() {
-        return mac_addr;
-    }
-
-    public Integer getMask() {
-        return mask;
-    }
-
-    public Integer getEquipmentId() {
-        return equipment_id;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public void setMask(Integer mask) {
-        this.mask = mask;
-    }
 }

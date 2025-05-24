@@ -8,34 +8,29 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 import db_conn.DBConn;
-public abstract class Model{
+import models_data.Entity;
+public abstract class Model<T extends Entity>{
     protected final String table_name;
-    protected final Integer id;
 
-    public Model(String table_name, Integer id){
+    public Model(String table_name){
         this.table_name = table_name;
-        this.id = id;
     }
 
     public String getTableName(){
         return table_name;
     }
-
-    public Integer getId() {
-        return id;
-    }
     
+    protected abstract T mapRowToEntity(ResultSet res) throws SQLException;
     public abstract boolean create() throws SQLException;
-    public abstract boolean insert() throws SQLException;
-    public abstract void print();
     
-    public ResultSet selectById(Integer id) throws SQLException{
+    public ArrayList<T> selectById(Integer id) throws SQLException{
         return this.select(null, 
                            new HashMap(Map.ofEntries(
                                     entry("id", id)
                                     ))
                           );
     }
+
     protected boolean insert(HashMap<String, Object> col_val_map) throws SQLException{
         StringBuilder columns = new StringBuilder(),
                       placeholders = new StringBuilder();
@@ -121,7 +116,7 @@ public abstract class Model{
         }
     }
 
-    protected ResultSet select(ArrayList<String> col_list, HashMap<String, Object> where_cond) throws SQLException{
+    protected ArrayList<T> select(ArrayList<String> col_list, HashMap<String, Object> where_cond) throws SQLException{
         StringBuilder where_str = new StringBuilder();
         
         // Default selects everything
@@ -145,7 +140,14 @@ public abstract class Model{
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
             
-            return stmt.executeQuery();
+            ResultSet res = stmt.executeQuery();
+
+            // Go through all result sets, convert them to the corresponding entity and add them to result
+            ArrayList<T> conv_res = new ArrayList<>();
+            while (res.next())
+                conv_res.add(mapRowToEntity(res));
+            
+            return conv_res;
         }
     }   
 }
