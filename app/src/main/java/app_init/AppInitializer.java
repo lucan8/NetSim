@@ -11,37 +11,40 @@ import models.RoutingTable;
 
 public class AppInitializer{
     private static final Company company_model;
-    private static final Connection conn_model;
     private static final Equipment equipment_model;
     private static final EquipmentInterface equipment_interface_model;
-    private static final MacAddressTable mac_addr_table_model;
+    private static final Connection conn_model;
     private static final Packet packet_model;
+    private static final MacAddressTable mac_addr_table_model;
     private static final RoutingTable routing_table_model;
 
     static {
         try {
             // Initialize DAOs
             company_model = new Company();
-            conn_model = new Connection();
             equipment_model = new Equipment();
             equipment_interface_model = new EquipmentInterface();
-            mac_addr_table_model = new MacAddressTable();
+            conn_model = new Connection();
             packet_model = new Packet();
+            mac_addr_table_model = new MacAddressTable();
             routing_table_model = new RoutingTable();
 
             System.out.println("[INFO]: Connecting to and initializing database");
             // Initialize database
             company_model.create();
-            conn_model.create();
             equipment_model.create();
             equipment_interface_model.create();
-            mac_addr_table_model.create();
+            conn_model.create();
             packet_model.create();
+            mac_addr_table_model.create();
             routing_table_model.create();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
     }
+
+    // Exists only to execute the static block
+    public static void init(){}
 
     public static Company getCompanyModel(){
         return company_model;
