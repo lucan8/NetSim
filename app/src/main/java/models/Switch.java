@@ -1,15 +1,6 @@
 package models;
 
 public class Switch extends Equipment {
-    // New default constructor
-    public Switch() {
-        super(); // Calls Equipment's default constructor
-    }
-
-    public Switch(Integer id, String name, Integer max_interface_count, Integer company_id) {
-        super(id, name, max_interface_count, company_id, EquipmentType.SWITCH);
-    }
-
     // @Override
     // public void forwardPacket(Packet packet, EquipmentInterface equipmentInterface) { // Updated parameter types
     //     // Check equipmentInterface is actually this switch's interface
