@@ -5,14 +5,9 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Scanner;
 
-import models.Company;
-import models.Connection;
-import models.Equipment;
-import models.EquipmentInterface;
-import models.Host;
-import models.Packet;
-import models.Router;
-import models.Switch;
+import models_data.*;
+
+import app_init.AppInitializer;
 public class Service{
     private static Scanner scanner = new Scanner(System.in);
     private static final Map<Integer, Runnable> menu_choices = Map.ofEntries(
@@ -36,12 +31,12 @@ public class Service{
         System.out.println("Enter company name: ");
         String company_name = scanner.nextLine();
 
-        Company company = new Company(0, company_name);
+        CompanyData company = new CompanyData(0, company_name);
 
         // Insert the equipment into the database
         boolean res;
         try{
-            res = company.insert();
+            res = AppInitializer.getCompanyModel().insert(company);
         } catch (SQLException e) {
             System.out.println("Error adding company: " + e.getMessage());
             return;
@@ -61,20 +56,21 @@ public class Service{
         String equipment_name = scanner.nextLine();
 
         // Retrieve list of all possible equipment types and join them into a string
-        List<Equipment.EquipmentType> equip_types_list = List.of(Equipment.EquipmentType.values());
+        List<EquipmentData.EquipmentType> equip_types_list = List.of(EquipmentData.EquipmentType.values());
         List<String> equip_types_list_s = equip_types_list.stream()
-                                                .map(Equipment.EquipmentType::toString)
+                                                .map(EquipmentData.EquipmentType::toString)
                                                 .collect(java.util.stream.Collectors.toList());
         // Map each enum to its string representation and join them with commas
         String equipment_types = equip_types_list_s.stream()
                                     .reduce((a, b) -> a + ", " + b)
                                     .orElse(""); 
-                            
+
+        // Prompt the user for an equipment type until a valid one is given                    
         String equipment_type;
         boolean is_valid_eq;
         do{
             System.out.println("Enter equipment type " + equipment_types + ": ");
-            equipment_type = scanner.nextLine();
+            equipment_type = scanner.nextLine().toUpperCase();
 
             is_valid_eq = equip_types_list_s.contains(equipment_type);
             if (!is_valid_eq)
@@ -89,26 +85,11 @@ public class Service{
         int company_id = scanner.nextInt();
         scanner.nextLine(); 
 
-        // Create equipment based on type
-        Equipment equipment = switch (equipment_type) {
-            case "ROUTER" -> new Router(0, equipment_name, max_interface_count, company_id);
-            case "SWITCH" -> new Switch(0, equipment_name, max_interface_count, company_id);
-            case "HOST" -> new Host(0, equipment_name, max_interface_count, company_id);
-            default -> {
-                System.out.println("Error adding equipment: Invalid equipment type");
-                yield null;
-            }
-        };
-
-        // Invalid type, just return
-        if (equipment == null) {
-            return;
-        }
-        
         // Insert the equipment into the database
+        EquipmentData equipment = new EquipmentData(0, equipment_name, max_interface_count, company_id, EquipmentData.EquipmentType.fromString(equipment_type));
         boolean res;
         try{
-            res = equipment.insert();
+            res = AppInitializer.getEquipmentModel().insert(equipment);
         } catch (SQLException e) {
             System.out.println("Error adding equipment: " + e.getMessage());
             return;
@@ -138,10 +119,11 @@ public class Service{
         Integer equipment_id = scanner.nextInt();
         scanner.nextLine();
 
-        EquipmentInterface equipmentInterface = new EquipmentInterface(0, ip, mac_address, mask, equipment_id);
+        // Insert interface inside database
+        EquipmentInterfaceData equipment_interface = new EquipmentInterfaceData(0, ip, mac_address, mask, equipment_id);
         boolean res;
         try {
-            res = equipmentInterface.insert();
+            res = AppInitializer.getEquipmentInterfaceModel().insert(equipment_interface);
         } catch (SQLException e) {
             System.out.println("Error adding equipment interface: " + e.getMessage());
             return;
@@ -165,13 +147,11 @@ public class Service{
         Integer equipment_interface_id_2 = scanner.nextInt();
         scanner.nextLine();
 
-        // Create connection object
-        Connection connection = new Connection(0, equipment_interface_id_1, equipment_interface_id_2);
-
         // Insert the connection into the database
+        ConnectionData connection = new ConnectionData(0, equipment_interface_id_1, equipment_interface_id_2);
         boolean res;
         try {
-            res = connection.insert();
+            res = AppInitializer.getConnectionModel().insert(connection);
         } catch (SQLException e) {
             System.out.println("Error adding connection: " + e.getMessage());
             return;
@@ -205,13 +185,11 @@ public class Service{
         System.out.println("Enter packet data: ");
         String data = scanner.nextLine();
 
-        // Create packet object
-        Packet packet = new Packet(0, connection_id, src_ip, dest_ip, src_mac, dest_mac, data);
-
         // Insert the packet into the database
+        PacketData packet = new PacketData(0, connection_id, src_ip, dest_ip, src_mac, dest_mac, data);
         boolean res;
         try {
-            res = packet.insert();
+            res = AppInitializer.getPacketModel().insert(packet);
         } catch (SQLException e) {
             System.out.println("Error adding packet: " + e.getMessage());
             return;
