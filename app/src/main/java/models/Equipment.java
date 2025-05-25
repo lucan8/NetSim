@@ -2,7 +2,8 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.util.*;
+import static java.util.Map.entry;
 import db_conn.DBConn;
 import models_data.EquipmentData;
 
@@ -11,6 +12,15 @@ public class Equipment extends Model<EquipmentData> {
         super("Equipment");
     }
 
+    @Override
+    protected HashMap<String, Object> getColumnsForInsert(EquipmentData data){
+        return new HashMap<>(Map.ofEntries(
+            entry("name", data.getName()),
+            entry("max_interface_count", data.getMaxInterfaceCount()),
+            entry("company_id", data.getCompanyId()),
+            entry("type", data.getType())
+        ));
+    }
     @Override
     protected EquipmentData mapRowToEntity(ResultSet res) throws SQLException{
         return new EquipmentData(
@@ -37,7 +47,7 @@ public class Equipment extends Model<EquipmentData> {
         """, this.table_name);
 
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             stmt.executeUpdate(query);
             return true;
         }

@@ -2,6 +2,9 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import static java.util.Map.entry;
 
 import db_conn.DBConn;
 import models_data.EquipmentInterfaceData;
@@ -11,6 +14,16 @@ public class EquipmentInterface extends Model<EquipmentInterfaceData> {
         super("EquipmentInterface");
     }
     
+    @Override
+    protected HashMap<String, Object> getColumnsForInsert(EquipmentInterfaceData data) throws SQLException {
+        return new HashMap<>(Map.ofEntries(
+            entry("ip", data.getIp()),
+            entry("mac_addr", data.getMacAddr()),
+            entry("mask", data.getMask()),
+            entry("equipment_id", data.getEquipmentId())
+        ));
+    }
+
     @Override
     protected EquipmentInterfaceData mapRowToEntity(ResultSet res) throws SQLException{
         return new EquipmentInterfaceData(
@@ -37,7 +50,7 @@ public class EquipmentInterface extends Model<EquipmentInterfaceData> {
         """, this.table_name);
         
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             stmt.executeUpdate(query);
             return true;
         }

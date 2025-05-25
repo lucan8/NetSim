@@ -15,7 +15,7 @@ public class MacAddressTableData extends Entity{
         this.mac_address = mac_address;
     }
 
-    public Integer getInterfaceId(){
+    public Integer getSwInterfaceId(){
         return sw_interface_id;
     }
 

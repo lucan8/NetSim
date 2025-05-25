@@ -31,7 +31,7 @@ public class EquipmentInterfaceData extends Entity{
         return ip;
     }
 
-    public String getMac_addr() {
+    public String getMacAddr() {
         return mac_addr;
     }
 

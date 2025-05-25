@@ -2,6 +2,9 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import static java.util.Map.entry;
 
 import db_conn.DBConn;
 import models_data.ConnectionData;
@@ -11,6 +14,14 @@ public class Connection extends Model<ConnectionData> {
         super("Connection");
     }
     
+    @Override
+    protected HashMap<String, Object> getColumnsForInsert(ConnectionData data) throws SQLException {
+        return new HashMap<>(Map.ofEntries(
+            entry("interface_id1", data.getInterfaceId1()),
+            entry("interface_id2", data.getInterfaceId2())
+        ));
+    }
+
     @Override
     public boolean create() throws SQLException{
         String query = String.format("""
@@ -25,7 +36,7 @@ public class Connection extends Model<ConnectionData> {
         """, this.table_name);
 
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             stmt.executeUpdate(query);
             return true;
         }

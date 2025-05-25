@@ -1,15 +1,28 @@
 package models;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
+
 import models_data.PacketData;
 public class Packet extends Model<PacketData>{
     public Packet(){
         super("Packet");
+    }
+
+    @Override
+    protected HashMap<String, Object> getColumnsForInsert(PacketData data) throws SQLException {
+        return new HashMap<>(Map.ofEntries(
+            entry("connection_id", data.getConnectionId()),
+            entry("src_ip_addr", data.getSrcIpAddr()),
+            entry("dest_ip_addr", data.getDestIpAddr()),
+            entry("src_mac_addr", data.getSrcMacAddr()),
+            entry("dest_mac_addr", data.getDestMacAddr()),
+            entry("data", data.getData())
+        ));
     }
 
     @Override
@@ -46,7 +59,7 @@ public class Packet extends Model<PacketData>{
         """ ,this.table_name);
         
         System.out.println(query);
-        try(PreparedStatement stmt = db_conn.DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = db_conn.DBConn.instance().prepareStatement(query)){
             stmt.executeUpdate(query);
             return true;
         }

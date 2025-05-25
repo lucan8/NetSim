@@ -2,6 +2,9 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import static java.util.Map.entry;
 
 import db_conn.DBConn;
 import models_data.CompanyData;
@@ -9,6 +12,13 @@ import models_data.CompanyData;
 public class Company extends Model<CompanyData> {
     public Company() {
         super("Company");
+    }
+
+    @Override
+    protected HashMap<String, Object> getColumnsForInsert(CompanyData data) throws SQLException{
+        return new HashMap<>(Map.ofEntries(
+            entry("name", data.getName())
+        ));
     }
 
     @Override
@@ -30,7 +40,7 @@ public class Company extends Model<CompanyData> {
         """, this.table_name);
 
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             stmt.executeUpdate(query);
             return true;
         }

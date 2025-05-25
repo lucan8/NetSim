@@ -2,9 +2,7 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import static java.util.Map.entry;
 
 import db_conn.DBConn;
@@ -21,6 +19,8 @@ public abstract class Model<T extends Entity>{
     }
     
     protected abstract T mapRowToEntity(ResultSet res) throws SQLException;
+    protected abstract HashMap<String, Object> getColumnsForInsert(T data) throws SQLException;
+
     public abstract boolean create() throws SQLException;
     
     public ArrayList<T> selectById(Integer id) throws SQLException{
@@ -31,7 +31,9 @@ public abstract class Model<T extends Entity>{
                           );
     }
 
-    protected boolean insert(HashMap<String, Object> col_val_map) throws SQLException{
+    public boolean insert(T data) throws SQLException{
+        HashMap<String, Object> col_val_map = getColumnsForInsert(data);
+
         StringBuilder columns = new StringBuilder(),
                       placeholders = new StringBuilder();
         String sep = ", ";
@@ -51,7 +53,7 @@ public abstract class Model<T extends Entity>{
         // Create and execute parameterized query
         String query = String.format("INSERT INTO %s (%s) VALUES(%s)", table_name, columns, placeholders);
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
 
@@ -75,7 +77,7 @@ public abstract class Model<T extends Entity>{
 
         // Create and execute parameterized query
         String query = String.format("DELETE FROM %s WHERE %s", table_name, where_str);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
             
@@ -108,7 +110,7 @@ public abstract class Model<T extends Entity>{
 
         // Create and execute parameterized query
         String query = String.format("UPDATE %s SET %s WHERE %s", table_name, update_str, where_str);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
 
@@ -136,7 +138,7 @@ public abstract class Model<T extends Entity>{
         String query = String.format("SELECT %s FROM %s WHERE %s", col_str, table_name, where_str);
 
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.Instance().prepareStatement(query)){
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
             for (int i = 0; i < parameters.size(); ++i)
                 stmt.setObject(i + 1, parameters.get(i));
             
