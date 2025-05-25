@@ -54,7 +54,7 @@ public class Packet extends Model<PacketData>{
             FOREIGN KEY(src_ip_addr) REFERENCES EquipmentInterface(ip),
             FOREIGN KEY(dest_ip_addr) REFERENCES EquipmentInterface(ip),
             FOREIGN KEY(src_mac_addr) REFERENCES EquipmentInterface(mac_addr),
-            FOREIGN KEY(dest_mac_addr) REFERENCES EquipmentInterface(mac_addr),
+            FOREIGN KEY(dest_mac_addr) REFERENCES EquipmentInterface(mac_addr)
         );
         """ ,this.table_name);
         
