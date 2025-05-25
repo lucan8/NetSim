@@ -1,0 +1,73 @@
+package app_init;
+import java.sql.SQLException;
+
+import models.Company;
+import models.Connection;
+import models.Equipment;
+import models.EquipmentInterface;
+import models.MacAddressTable;
+import models.Packet;
+import models.RoutingTable;
+
+public class AppInitializer{
+    private static final Company company_model;
+    private static final Connection conn_model;
+    private static final Equipment equipment_model;
+    private static final EquipmentInterface equipment_interface_model;
+    private static final MacAddressTable mac_addr_table_model;
+    private static final Packet packet_model;
+    private static final RoutingTable routing_table_model;
+
+    static {
+        try {
+            // Initialize DAOs
+            company_model = new Company();
+            conn_model = new Connection();
+            equipment_model = new Equipment();
+            equipment_interface_model = new EquipmentInterface();
+            mac_addr_table_model = new MacAddressTable();
+            packet_model = new Packet();
+            routing_table_model = new RoutingTable();
+
+            System.out.println("[INFO]: Connecting to and initializing database");
+            // Initialize database
+            company_model.create();
+            conn_model.create();
+            equipment_model.create();
+            equipment_interface_model.create();
+            mac_addr_table_model.create();
+            packet_model.create();
+            routing_table_model.create();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+    }
+
+    public static Company getCompanyModel(){
+        return company_model;
+    }
+
+    public static Connection getConnectionModel() {
+        return conn_model;
+    }
+
+    public static Equipment getEquipmentModel() {
+        return equipment_model;
+    }
+
+    public static EquipmentInterface getEquipmentInterfaceModel() {
+        return equipment_interface_model;
+    }
+
+    public static MacAddressTable getMacAddressTableModel() {
+        return mac_addr_table_model;
+    }
+
+    public static Packet getPacketModel() {
+        return packet_model;
+    }
+
+    public static RoutingTable getRoutingTableModel() {
+        return routing_table_model;
+    }
+}

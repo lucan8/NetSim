@@ -2,11 +2,6 @@ package db_conn;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import models.Company;
-import models.Equipment;
-import models.EquipmentInterface;
-import models.Packet;
 public class DBConn{
     private static Connection instance = null;
     private DBConn(){}
@@ -23,40 +18,18 @@ public class DBConn{
     }
 
     // Returns the database connection object(and sets it if needed)
-    public static Connection Instance() throws SQLException{
+    public static Connection instance() throws SQLException{
         if (instance == null){
             String url = "jdbc:mysql://localhost:3306/packet_tracer_2";
             String user = "root";
             String password = "REDACTED";
             instance = DriverManager.getConnection(url, user, password);
-
-            System.out.println("[INFO] Connected to database successfully");
-            System.out.println("[INFO] Creating tables if they don't exist");
-
-            initDB();
         }
         return instance;
     }
 
-    private static void initDB() throws SQLException{
-        Company company = new Company();
-        company.create();
-
-        Equipment equipment = new Equipment();
-        equipment.create();
-    
-        EquipmentInterface equipment_interface = new EquipmentInterface();
-        equipment_interface.create();
-
-        models.Connection connection = new models.Connection();
-        connection.create();
-
-        Packet packet = new Packet();
-        packet.create();
-    }   
-
     public static boolean TestConn() throws SQLException{
-        Connection inst = Instance();
+        Connection inst = instance();
 
         return inst.isValid(2);
     }
