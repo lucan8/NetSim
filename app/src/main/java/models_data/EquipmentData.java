@@ -4,15 +4,14 @@ public class EquipmentData extends Entity{
     public enum EquipmentType {
         ROUTER,
         SWITCH,
-        HOST,
-        OTHER;
+        HOST;
 
         public static EquipmentType fromString(String type){
             return switch (type.toUpperCase()) {
                 case "ROUTER" -> EquipmentType.ROUTER;
                 case "SWITCH" -> EquipmentType.SWITCH;
                 case "HOST" -> EquipmentType.HOST;
-                default -> EquipmentType.OTHER;
+                default -> null;
             };
         } 
     }
@@ -37,6 +36,7 @@ public class EquipmentData extends Entity{
         this.company_id = company_id;
         this.type = type.toString();
     }
+
 
     public String getName() {
         return name;
