@@ -1,7 +1,7 @@
 package models;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
@@ -40,7 +40,7 @@ public class Company extends Model<CompanyData> {
         """, this.table_name);
 
         System.out.println(query);
-        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
+        try(Statement stmt = DBConn.instance().createStatement()){
             stmt.executeUpdate(query);
             return true;
         }

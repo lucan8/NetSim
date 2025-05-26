@@ -24,7 +24,7 @@ public class EquipmentInterfaceData extends Entity{
     public void print(){
         System.out.println("id: " + this.id);
         System.out.println("ip: " + this.ip + "/" + this.mask);
-        System.out.println("mac_addr: " + this.mac_addr);
+        System.out.println("mac address: " + this.mac_addr);
     }    
     
     public String getIp() {
