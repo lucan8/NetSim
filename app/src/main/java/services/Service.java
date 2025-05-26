@@ -1,10 +1,12 @@
 package services;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import static java.util.Map.entry;
 import java.util.Scanner;
 
 import app_init.AppInitializer;
@@ -16,22 +18,60 @@ import models_data.PacketData;
 
 public class Service{
     private static Scanner scanner = new Scanner(System.in);
-    private static final Map<Integer, Runnable> menu_choices = Map.ofEntries(
-            entry(1, Service::addCompany),
-            entry(2, Service::addEquipment),
-            entry(3, Service::addEquipmentInterface),
-            entry(4, Service::addConnection),
-            entry(5, Service::addPacket),
-            entry(6, Service::listEquipmentInterfaces),
-            entry(7, Service::updatePacketLayer2Header),
-            entry(8, Service::listPacketsDataForEquipment),
-            entry(9, Service::updateInterfaceIpAndMask),
-            // entry(10, Service::listEquipments),
-            entry(11, () -> {
+    private static final String AUDIT_FILE_NAME = "audit.csv";
+    private static FileWriter audit_file_writer;
+    // Make this an arraylist instead of a map
+    private static final Runnable[] menu_choices = new Runnable[]{
+            Service::addCompany,
+            Service::addEquipment,
+            Service::addEquipmentInterface,
+            Service::addConnection,
+            Service::addPacket,
+            Service::listEquipmentInterfaces,
+            Service::updatePacketLayer2Header,
+            Service::listPacketsDataForEquipment,
+            Service::updateInterfaceIpAndMask,
+            Service::removeConnection,
+            () -> {
                 System.out.println("Exiting...");
                 System.exit(0);
-            })
-        );
+            }
+    };
+
+    private static final String[] menu_choices_strings = new String[]{
+            "Add company",
+            "Add equipment",
+            "Add equipment interface",
+            "Add connection",
+            "Add packet",
+            "List equipment interfaces",
+            "Update the layer 2 header of a packet",
+            "List the data of packets for equipment",
+            "Update interface ip and mask",
+            "Remove a connection",
+            "Exit"
+    };
+
+    static {
+        try{
+            audit_file_writer = new FileWriter(AUDIT_FILE_NAME, true);
+        } catch(IOException e){
+            throw new RuntimeException("Error opening " + AUDIT_FILE_NAME + "for appending: " + e);
+        }
+
+    }
+
+    protected static void audit(String action){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
+        try {
+            audit_file_writer.append(String.format("%s, %s\n", formattedNow, action));
+            audit_file_writer.flush();
+        } catch (IOException e){ 
+            System.out.println("Error writing to audit file: " + e.getMessage());
+        }
+    }
 
     public static void addCompany(){
         System.out.println("Enter company name: ");
@@ -318,36 +358,49 @@ public class Service{
 
         System.out.println("Interface updated successfully");
     }
-    // public static void listConnections();
-    // public static void listEquipments();
+
+    public static void removeConnection(){
+        System.out.println("Enter connection id: ");
+        Integer connection_id = scanner.nextInt();
+        scanner.nextLine();
+
+        // Remove the connection from the database
+        boolean res;
+        try {
+            AppInitializer.getPacketModel().deleteByConnection(connection_id);
+            res = AppInitializer.getConnectionModel().deleteById(connection_id);
+        } catch (SQLException e) {
+            System.out.println("Error removing connection: " + e.getMessage());
+            return;
+        }
+        // Check if the removal was successful
+        if (!res) {
+            System.out.println("Error removing connection: Failed to delete from database");
+            return;
+        }
+        System.out.println("Connection removed successfully");
+    }
 
     private static void menuPrint(){
-        System.out.println("1. Add company");
-        System.out.println("2. Add equipment");
-        System.out.println("3. Add equipment interface");
-        System.out.println("4. Add connection");
-        System.out.println("5. Add packet");
-        System.out.println("6. List equipment interfaces");
-        System.out.println("7. Update the layer 2 header of a packet");
-        System.out.println("8. List the data of packets for equipment");
-        System.out.println("9. Update inteface ip and mask");
-        // System.out.println("10. List equipments");
-        System.out.println("11. Exit");
-        System.out.println("Your choice: ");
+        for (int i = 0 ; i < menu_choices.length; ++i)
+            System.out.println((i + 1) + ". " + menu_choices_strings[i]);
     }
+
     public static void menu(){
         menuPrint();
-        Runnable chosen_func = null;
+        int choice;
         do{
-            int choice = scanner.nextInt();
+            choice = scanner.nextInt();
             scanner.nextLine();
 
-            chosen_func = menu_choices.get(choice);
-            if (chosen_func == null)
-                System.out.println("Invalid choice");
-        } while (chosen_func == null);
+            if (choice < 1 || choice > menu_choices.length)
+                System.out.println("Invalid choice, try again");
+            else
+                break;
+        } while (true);
 
-        chosen_func.run();
+        audit(menu_choices_strings[choice - 1]);
+        menu_choices[choice - 1].run();
     }
 
     protected static boolean isValidIp(String ip){
