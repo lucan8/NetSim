@@ -3,10 +3,12 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
 
+import db_conn.DBConn;
 import models_data.PacketData;
 public class Packet extends Model<PacketData>{
     public Packet(){
@@ -65,4 +67,27 @@ public class Packet extends Model<PacketData>{
         }
     }
 
+    public ArrayList<PacketData> selectPacketsForEquipment(Integer equipment_id) throws SQLException{
+        ArrayList<PacketData> conv_res = new ArrayList<>();
+        String query = """
+                        SELECT p.id AS id, p.connection_id AS connection_id, src_ip_addr,
+                        dest_ip_addr, src_mac_addr, dest_mac_addr, data FROM packet AS p 
+                        JOIN connection AS c ON p.connection_id = c.id
+                        JOIN equipmentInterface AS ei1 ON ei1.id = c.interface_id1
+                        JOIN equipmentInterface AS ei2 ON ei2.id = c.interface_id2
+                        WHERE ei1.equipment_id = ? OR ei2.equipment_id = ?
+                      """;
+    
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){
+            stmt.setObject(1, equipment_id);
+            stmt.setObject(2, equipment_id);
+
+            ResultSet res = stmt.executeQuery();
+
+            while (res.next())
+                conv_res.add(mapRowToEntity(res));
+            
+            return conv_res;
+        }
+    }
 }

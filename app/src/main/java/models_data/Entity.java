@@ -10,6 +10,10 @@ public abstract class Entity {
         this.id = id;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     // Maybe in the future
     // public abstract void print();
 }

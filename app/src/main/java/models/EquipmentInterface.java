@@ -2,6 +2,7 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
@@ -29,7 +30,7 @@ public class EquipmentInterface extends Model<EquipmentInterfaceData> {
         return new EquipmentInterfaceData(
             res.getInt("id"),
             res.getString("ip"),
-            res.getString("mac_address"),
+            res.getString("mac_addr"),
             res.getInt("mask"),
             res.getInt("equipment_id")
         );
@@ -55,28 +56,17 @@ public class EquipmentInterface extends Model<EquipmentInterfaceData> {
             return true;
         }
     }
-    
 
     // Selects all interfaces for the given equipment id
-    // public List<EquipmentInterface> selectByEquipment(Integer equipment_id) throws SQLException{
-    //     ResultSet result = super.select(null, new HashMap(Map.ofEntries(
-    //         entry("equipment_id", equipment_id)
-    //     )));
+    public ArrayList<EquipmentInterfaceData> selectByEquipment(Integer equipment_id) throws SQLException{
+        ArrayList<EquipmentInterfaceData> result = super.select(null, new HashMap(Map.ofEntries(
+            entry("equipment_id", equipment_id)
+        )));
 
+        return result;
+    }
 
-    //     List<EquipmentInterface> interfaces = new java.util.ArrayList<>();
-    //     while (result.next()){
-    //         interfaces.add(new EquipmentInterface(
-    //             result.getInt("id"),
-    //             result.getString("ip"),
-    //             result.getString("mac_addr"),
-    //             result.getInt("mask"),
-    //             result.getInt("equipment_id")
-    //         ));
-    //         System.out.println("id: " + result.getInt("id"));
-    //     }
-    //     return interfaces;
-    // }
-
-    
+    public ArrayList<EquipmentInterfaceData> selectAll() throws SQLException{
+        return super.select(null);
+    }
 }

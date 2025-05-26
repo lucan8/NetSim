@@ -1,5 +1,7 @@
 package services;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import static java.util.Map.entry;
@@ -20,9 +22,9 @@ public class Service{
             entry(3, Service::addEquipmentInterface),
             entry(4, Service::addConnection),
             entry(5, Service::addPacket),
-            // entry(6, Service::listEquipmentInterfaces),
+            entry(6, Service::listEquipmentInterfaces),
             // entry(7, Service::listNetwork),
-            // entry(8, Service::listPackets),
+            entry(8, Service::listPacketsDataForEquipment),
             // entry(9, Service::listConnections),
             // entry(10, Service::listEquipments),
             entry(11, () -> {
@@ -208,28 +210,54 @@ public class Service{
         System.out.println("Packet added successfully");
     }
 
-    // public static void listEquipmentInterfaces(){
-    //     System.out.println("Equipment id: ");
-    //     Integer equipment_id = scanner.nextInt();
-    //     scanner.nextLine();
+    public static void listEquipmentInterfaces(){
+        System.out.println("Equipment id: ");
+        Integer equipment_id = scanner.nextInt();
+        scanner.nextLine();
 
-    //     EquipmentInterface eq_interface = new EquipmentInterface();
-    //     List<EquipmentInterface> eq_interfaces;
-    //     try {
-    //         eq_interfaces = eq_interface.selectByEquipment(equipment_id);
-    //     } catch (SQLException e) {
-    //         System.out.println("Error retrieving equipment interfaces: " + e.getMessage());
-    //         return;
-    //     }
+        ArrayList<EquipmentInterfaceData> eq_interfaces;
+        try {
+            eq_interfaces = AppInitializer.getEquipmentInterfaceModel().selectByEquipment(equipment_id);
+        } catch (SQLException e) {
+            System.out.println("Error retrieving equipment interfaces: " + e.getMessage());
+            return;
+        }
 
-    //     System.out.println("Equipment " + equipment_id.toString() + " interfaces: ");
+        if (eq_interfaces.isEmpty()) {
+            System.out.println("No interfaces found for equipment with id " + equipment_id);
+            return;
+        }
+
+        System.out.println("Equipment " + equipment_id.toString() + " interfaces: ");
         
-    //     for (var curr : eq_interfaces)
-    //         curr.print();
+        for (var curr : eq_interfaces)
+            curr.print();
 
-    // }
-    // public static void listNetwork();
-    // public static void listPackets();
+    }
+
+    // List all packets that went through an equipment
+    public static void listPacketsDataForEquipment(){
+        System.out.println("Equipment id: ");
+        Integer equipment_id = scanner.nextInt();
+
+        // Retrieve packets for the given equipment id
+        ArrayList<PacketData> packets;
+        try{
+            packets = AppInitializer.getPacketModel().selectPacketsForEquipment(equipment_id);
+        } catch(SQLException e){
+            System.out.println("Error retrieving packets: " + e.getMessage());
+            return;
+        }
+
+        if (packets.isEmpty()) {
+            System.out.println("No packets found for equipment with id " + equipment_id);
+            return;
+        }
+
+        System.out.println("Packets for equipment " + equipment_id.toString() + ": ");
+        for (PacketData packet : packets)
+            System.out.println("Packet " + packet.getId() + " data: " + packet.getData());
+    }
     // public static void listConnections();
     // public static void listEquipments();
 
@@ -239,9 +267,9 @@ public class Service{
         System.out.println("3. Add equipment interface");
         System.out.println("4. Add connection");
         System.out.println("5. Add packet");
-        // System.out.println("6. List equipment interfaces");
+        System.out.println("6. List equipment interfaces");
         // System.out.println("7. List network");
-        // System.out.println("8. List packets");
+        System.out.println("8. List the data of packets for equipment");
         // System.out.println("9. List connections");
         // System.out.println("10. List equipments");
         System.out.println("11. Exit");
@@ -261,4 +289,51 @@ public class Service{
 
         chosen_func.run();
     }
+
+    protected static boolean isValidIp(String ip){
+        try {
+            parseIp(ip);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected static boolean isValidMacAddr(String mac_addr){
+        List<String> split_mac_addr = Arrays.asList(mac_addr.split(":"));
+        if (split_mac_addr.size() != 6)
+            return false;
+        
+        for (String part_mac : split_mac_addr){
+            try{
+                int parsed_part_ip = Integer.parseInt(part_mac, 16);
+                if (parsed_part_ip < 0 || parsed_part_ip > 255)
+                    return false;
+            }
+            catch (NumberFormatException e){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected static int parseIp(String ip) throws RuntimeException, NumberFormatException {
+        Integer result = 0;
+
+        List<String> split_ip = Arrays.asList(ip.split("."));
+
+        if (split_ip.size() != 4)
+            throw new RuntimeException("Invalid IP address format");
+        
+        for (int i = 0; i < split_ip.size(); ++i){
+            int parsed_part_ip = Integer.parseInt(split_ip.get(i));
+            if (parsed_part_ip < 0 || parsed_part_ip > 255)
+                throw new RuntimeException("Invalid IP address format");
+
+            result += parsed_part_ip * (int)Math.pow(256, split_ip.size() - i - 1); 
+        }
+        return result;
+    }
+
 }
