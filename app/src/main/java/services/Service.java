@@ -25,7 +25,7 @@ public class Service{
             entry(6, Service::listEquipmentInterfaces),
             entry(7, Service::updatePacketLayer2Header),
             entry(8, Service::listPacketsDataForEquipment),
-            // entry(9, Service::listConnections),
+            entry(9, Service::updateInterfaceIpAndMask),
             // entry(10, Service::listEquipments),
             entry(11, () -> {
                 System.out.println("Exiting...");
@@ -287,6 +287,37 @@ public class Service{
         for (PacketData packet : packets)
             System.out.println("Packet " + packet.getId() + " data: " + packet.getData());
     }
+    
+    public static void updateInterfaceIpAndMask(){
+        System.out.println("Enter interface id: ");
+
+        Integer interface_id = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter new ip: ");
+        String new_ip = scanner.nextLine();
+
+        System.out.println("Enter new mask: ");
+        Integer new_mask = scanner.nextInt();
+        scanner.nextLine();
+
+        // Update the interface in the database
+        boolean res;
+        try {
+            res = AppInitializer.getEquipmentInterfaceModel().updateIpAndMask(interface_id, new_ip, new_mask);
+        } catch (SQLException e) {
+            System.out.println("Error updating interface: " + e.getMessage());
+            return; 
+        }
+
+        // Check if the update was successful
+        if (!res) {
+            System.out.println("Error updating interface: Failed to update in database");
+            return;
+        }
+
+        System.out.println("Interface updated successfully");
+    }
     // public static void listConnections();
     // public static void listEquipments();
 
@@ -299,7 +330,7 @@ public class Service{
         System.out.println("6. List equipment interfaces");
         System.out.println("7. Update the layer 2 header of a packet");
         System.out.println("8. List the data of packets for equipment");
-        // System.out.println("9. List connections");
+        System.out.println("9. Update inteface ip and mask");
         // System.out.println("10. List equipments");
         System.out.println("11. Exit");
         System.out.println("Your choice: ");

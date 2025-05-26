@@ -69,4 +69,17 @@ public class EquipmentInterface extends Model<EquipmentInterfaceData> {
     public ArrayList<EquipmentInterfaceData> selectAll() throws SQLException{
         return super.select(null);
     }
+
+    public boolean updateIpAndMask(Integer id, String new_ip, Integer new_mask) throws SQLException{
+        HashMap<String, Object> update_col = new HashMap<>(Map.ofEntries(
+            entry("ip", new_ip),
+            entry("mask", new_mask)
+        ));
+
+        HashMap<String, Object> where_cond = new HashMap<>(Map.ofEntries(
+            entry("id", id)
+        ));
+
+        return update(update_col, where_cond);
+    }
 }
