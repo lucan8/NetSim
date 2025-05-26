@@ -2,7 +2,9 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import static java.util.Map.entry;
 
 import db_conn.DBConn;
@@ -29,6 +31,11 @@ public abstract class Model<T extends Entity>{
                                     entry("id", id)
                                     ))
                           );
+    }
+    public boolean deleteById(Integer id) throws SQLException{
+        return delete(new HashMap(Map.ofEntries(
+            entry("id", id)
+        )));
     }
 
     public boolean insert(T data) throws SQLException{
