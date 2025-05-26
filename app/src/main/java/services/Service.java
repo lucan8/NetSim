@@ -23,7 +23,7 @@ public class Service{
             entry(4, Service::addConnection),
             entry(5, Service::addPacket),
             entry(6, Service::listEquipmentInterfaces),
-            // entry(7, Service::listNetwork),
+            entry(7, Service::updatePacketLayer2Header),
             entry(8, Service::listPacketsDataForEquipment),
             // entry(9, Service::listConnections),
             // entry(10, Service::listEquipments),
@@ -235,6 +235,35 @@ public class Service{
 
     }
 
+    public static void updatePacketLayer2Header(){
+        System.out.println("Enter packet id: ");
+        Integer packet_id = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter new source mac address: ");
+        String src_mac = scanner.nextLine();
+
+        System.out.println("Enter new destination mac address: ");
+        String dest_mac = scanner.nextLine();
+
+        // Update the packet in the database
+        boolean res;
+        try {
+            res = AppInitializer.getPacketModel().updateLayer2Header(packet_id, src_mac, dest_mac);
+        } catch (SQLException e) {
+            System.out.println("Error updating packet layer 2 header: " + e.getMessage());
+            return;
+        }
+
+        // Check if the update was successful
+        if (!res) {
+            System.out.println("Error updating packet layer 2 header: Failed to update in database");
+            return;
+        }
+
+        System.out.println("Packet layer 2 header updated successfully");
+    }
+
     // List all packets that went through an equipment
     public static void listPacketsDataForEquipment(){
         System.out.println("Equipment id: ");
@@ -268,7 +297,7 @@ public class Service{
         System.out.println("4. Add connection");
         System.out.println("5. Add packet");
         System.out.println("6. List equipment interfaces");
-        // System.out.println("7. List network");
+        System.out.println("7. Update the layer 2 header of a packet");
         System.out.println("8. List the data of packets for equipment");
         // System.out.println("9. List connections");
         // System.out.println("10. List equipments");

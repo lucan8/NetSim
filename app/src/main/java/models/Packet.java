@@ -90,4 +90,16 @@ public class Packet extends Model<PacketData>{
             return conv_res;
         }
     }
+
+    public boolean updateLayer2Header(Integer id, String src_mac_addr, String dest_mac_addr) throws SQLException{
+        HashMap<String, Object> update_col = new HashMap(Map.ofEntries(
+            entry("src_mac_addr", src_mac_addr),
+            entry("dest_mac_addr", dest_mac_addr)
+        ));
+        HashMap<String, Object> where_cond = new HashMap(Map.ofEntries(
+            entry("id", id))
+        );
+
+        return update(update_col, where_cond);
+    }
 }
