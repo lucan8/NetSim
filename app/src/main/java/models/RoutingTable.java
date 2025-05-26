@@ -2,10 +2,12 @@ package models;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
 
+import db_conn.DBConn;
 import models_data.RoutingTableData;
 
 public class RoutingTable extends Model<RoutingTableData>{
@@ -19,7 +21,7 @@ public class RoutingTable extends Model<RoutingTableData>{
         return new HashMap<>(Map.ofEntries(
             entry("ip", data.getIp()),
             entry("mask", data.getMask()),
-            entry("interface_id", data.getInterfaceId())
+            entry("r_interface_id", data.getRInterfaceId())
         ));
     }
 
@@ -29,10 +31,28 @@ public class RoutingTable extends Model<RoutingTableData>{
             res.getInt("id"),
             res.getString("ip"),
             res.getInt("mask"),
-            res.getInt("interface_id")
+            res.getInt("r_interface_id")
         );
     }
 
     @Override
-    public boolean create() throws SQLException{return true;}
+    public boolean create() throws SQLException{
+        String query = String.format("""
+            CREATE TABLE IF NOT EXISTS %s(
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                ip VARCHAR(20) NOT NULL,
+                mask INTEGER NOT NULL,
+                r_interface_id INTEGER NOT NULL,
+
+                FOREIGN KEY(r_interface_id) REFERENCES equipmentInterface(id)
+            )
+        """, this.table_name);
+
+        System.out.println(query);
+
+        try(Statement stmt = DBConn.instance().createStatement()){
+            stmt.executeUpdate(query);
+            return true;
+        }
+    }
 }
