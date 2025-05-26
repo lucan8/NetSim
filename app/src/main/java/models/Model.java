@@ -151,5 +151,25 @@ public abstract class Model<T extends Entity>{
             
             return conv_res;
         }
-    }   
+    }
+    protected ArrayList<T> select(ArrayList<String> col_list) throws SQLException{
+        // Default selects everything
+        String col_str = "*";
+        if (col_list != null)
+            col_str = String.join(", ", col_list);
+
+        String query = String.format("SELECT %s FROM %s", col_str, table_name);
+
+        System.out.println(query);
+        try(PreparedStatement stmt = DBConn.instance().prepareStatement(query)){  
+            ResultSet res = stmt.executeQuery();
+
+            // Go through all result sets, convert them to the corresponding entity and add them to result
+            ArrayList<T> conv_res = new ArrayList<>();
+            while (res.next())
+                conv_res.add(mapRowToEntity(res));
+            
+            return conv_res;
+        }
+    }
 }
