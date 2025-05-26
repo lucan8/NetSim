@@ -52,11 +52,7 @@ public class Packet extends Model<PacketData>{
             dest_mac_addr VARCHAR(20) NOT NULL,
             data TEXT NOT NULL,
 
-            FOREIGN KEY(connection_id) REFERENCES Connection(id),
-            FOREIGN KEY(src_ip_addr) REFERENCES EquipmentInterface(ip),
-            FOREIGN KEY(dest_ip_addr) REFERENCES EquipmentInterface(ip),
-            FOREIGN KEY(src_mac_addr) REFERENCES EquipmentInterface(mac_addr),
-            FOREIGN KEY(dest_mac_addr) REFERENCES EquipmentInterface(mac_addr)
+            FOREIGN KEY(connection_id) REFERENCES Connection(id)
         );
         """ ,this.table_name);
         
