@@ -5,9 +5,13 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Scanner;
 
-import models_data.*;
-
 import app_init.AppInitializer;
+import models_data.CompanyData;
+import models_data.ConnectionData;
+import models_data.EquipmentData;
+import models_data.EquipmentInterfaceData;
+import models_data.PacketData;
+
 public class Service{
     private static Scanner scanner = new Scanner(System.in);
     private static final Map<Integer, Runnable> menu_choices = Map.ofEntries(
