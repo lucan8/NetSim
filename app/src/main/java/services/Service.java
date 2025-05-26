@@ -14,8 +14,9 @@ import models_data.CompanyData;
 import models_data.ConnectionData;
 import models_data.EquipmentData;
 import models_data.EquipmentInterfaceData;
+import models_data.MacAddressTableData;
 import models_data.PacketData;
-
+import models_data.RoutingTableData;
 public class Service{
     private static Scanner scanner = new Scanner(System.in);
     private static final String AUDIT_FILE_NAME = "audit.csv";
@@ -32,6 +33,10 @@ public class Service{
             Service::listPacketsDataForEquipment,
             Service::updateInterfaceIpAndMask,
             Service::removeConnection,
+            Service::addMacAddressEntry,
+            Service::addRoute,
+            Service::listMacAdressTableForEquipment,
+            Service::removeRoute,
             () -> {
                 System.out.println("Exiting...");
                 System.exit(0);
@@ -49,6 +54,10 @@ public class Service{
             "List the data of packets for equipment",
             "Update interface ip and mask",
             "Remove a connection",
+            "Add mac address entry to the mac address table",
+            "Add route to the routing table",
+            "List the mac address table for an equipment",
+            "Remove route from the routing table",
             "Exit"
     };
 
@@ -381,9 +390,112 @@ public class Service{
         System.out.println("Connection removed successfully");
     }
 
-    private static void menuPrint(){
-        for (int i = 0 ; i < menu_choices.length; ++i)
-            System.out.println((i + 1) + ". " + menu_choices_strings[i]);
+
+    // TODO: Check if an actual switch interface was given
+    public static void addMacAddressEntry(){
+        System.out.println("Enter switch interface id: ");
+        Integer interface_id = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter mac address: ");
+        String mac_address = scanner.nextLine();
+
+        // Insert the mac address entry into the database
+        // Removed undefined MacAddressTableData instantiation
+
+        MacAddressTableData data = new MacAddressTableData(0, interface_id, mac_address);
+        boolean res;
+        try {
+            res = AppInitializer.getMacAddressTableModel().insert(data);
+        } catch (SQLException e) {
+            System.out.println("Error adding mac address entry: " + e.getMessage());
+            return;
+        }
+
+        // Check if the insertion was successful
+        if (!res) {
+            System.out.println("Error adding mac address entry: Failed to insert into database");
+            return;
+        }
+
+        System.out.println("Mac address entry added successfully");
+    }
+
+    public static void addRoute(){
+        System.out.println("Enter destination network ip: ");
+        String dest_network_ip = scanner.nextLine();
+
+        System.out.println("Enter destination network mask: ");
+        Integer dest_network_mask = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter outgoing interface id: ");
+        Integer outgoing_interface_id = scanner.nextInt();
+        scanner.nextLine();
+
+        // Insert the route into the database
+        RoutingTableData route = new RoutingTableData(0, dest_network_ip, dest_network_mask, outgoing_interface_id);
+        boolean res;
+        try {
+            res = AppInitializer.getRoutingTableModel().insert(route);
+        } catch (SQLException e) {
+            System.out.println("Error adding route: " + e.getMessage());
+            return;
+        }
+
+        if (!res) {
+            System.out.println("Error adding route: Failed to insert into database");
+            return;
+        }
+
+        System.out.println("Route added successfully");
+    }
+
+    public static void listMacAdressTableForEquipment(){
+        System.out.println("Equipment id: ");
+        Integer equipment_id = scanner.nextInt();
+        scanner.nextLine();
+
+        // Retrieve the mac address table for the given equipment id
+        ArrayList<MacAddressTableData> mac_address_table;
+        try {
+            mac_address_table = AppInitializer.getMacAddressTableModel().selectByEquipment(equipment_id);
+        } catch (SQLException e) {
+            System.out.println("Error retrieving mac address table: " + e.getMessage());
+            return;
+        }
+
+        if (mac_address_table.isEmpty()) {
+            System.out.println("No mac address entries found for equipment with id " + equipment_id);
+            return;
+        }
+
+        System.out.println("Mac address table for equipment " + equipment_id.toString() + ": ");
+        for (MacAddressTableData entry : mac_address_table)
+            entry.print();
+    }
+
+    public static void removeRoute(){
+        System.out.println("Enter route id: ");
+        Integer route_id = scanner.nextInt();
+        scanner.nextLine();
+
+        // Remove the route from the database
+        boolean res;
+        try {
+            res = AppInitializer.getRoutingTableModel().deleteById(route_id);
+        } catch (SQLException e) {
+            System.out.println("Error removing route: " + e.getMessage());
+            return;
+        }
+
+        // Check if the removal was successful
+        if (!res) {
+            System.out.println("Error removing route: Failed to delete from database");
+            return;
+        }
+
+        System.out.println("Route removed successfully");
     }
 
     public static void menu(){
@@ -401,6 +513,11 @@ public class Service{
 
         audit(menu_choices_strings[choice - 1]);
         menu_choices[choice - 1].run();
+    }
+
+    private static void menuPrint(){
+        for (int i = 0 ; i < menu_choices_strings.length; ++i)
+            System.out.println((i + 1) + ". " + menu_choices_strings[i]);
     }
 
     protected static boolean isValidIp(String ip){
