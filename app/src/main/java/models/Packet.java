@@ -98,4 +98,10 @@ public class Packet extends Model<PacketData>{
 
         return update(update_col, where_cond);
     }
+
+    public boolean deleteByConnection(Integer connection_id) throws SQLException{
+        return delete(new HashMap(Map.ofEntries(
+            entry("connection_id", connection_id)
+        )));
+    }
 }
