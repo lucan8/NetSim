@@ -8,8 +8,17 @@ import models.EquipmentInterface;
 import models.MacAddressTable;
 import models.Packet;
 import models.RoutingTable;
+import models.User;
+import services.AppService;
+import services.AuthService;
 
 public class AppInitializer{
+    // Services
+    private static final AppService app_service;
+    private static final AuthService auth_service;
+
+    // models
+    private static final User user_model;
     private static final Company company_model;
     private static final Equipment equipment_model;
     private static final EquipmentInterface equipment_interface_model;
@@ -20,7 +29,12 @@ public class AppInitializer{
 
     static {
         try {
+            // Initialize services
+            app_service = new AppService();
+            auth_service = new AuthService();
+
             // Initialize DAOs
+            user_model = new User();
             company_model = new Company();
             equipment_model = new Equipment();
             equipment_interface_model = new EquipmentInterface();
@@ -31,6 +45,7 @@ public class AppInitializer{
 
             System.out.println("[INFO]: Connecting to and initializing database");
             // Initialize database
+            user_model.create();
             company_model.create();
             equipment_model.create();
             equipment_interface_model.create();
@@ -46,6 +61,18 @@ public class AppInitializer{
     // Exists only to execute the static block
     public static void init(){}
 
+    public static AppService getAppService(){
+        return app_service;
+    }
+
+    public static AuthService getAuthService(){
+        return auth_service;
+    }
+    
+    public static User getUserModel() {
+        return user_model;
+    }
+    
     public static Company getCompanyModel(){
         return company_model;
     }
