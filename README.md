@@ -28,8 +28,8 @@ Most interesting operations:
 
 `db_conn/DBConn.java`: Singleton class that holds a database connection
 
-`models/` : DAOs providing an abstraction over the database objects All classes extend the Model class which
-implements the template method pattern, providing a very general implementation for the CRUD operations that the 
+`models/` : DAOs providing an abstraction over the database objects. All classes extend the Model class which
+implements the template method pattern, providing a very general implementation for the CRUD operations that the
 children classes will use. The classes don't hold any data, for that they rely on entities(models_data).
 
 `models_data/` : POJOs that hold database entries
