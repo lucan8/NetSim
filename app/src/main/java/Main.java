@@ -1,14 +1,10 @@
-import java.sql.SQLException;
-
 import app_init.AppInitializer;
-import db_conn.DBConn;
 public class Main{
     public static void main(String[] args) {
         try{
-            DBConn.TestConn();
             AppInitializer.init();
-        } catch (SQLException e){
-            System.err.println("[ERROR] Testing the database connection: " + e.getMessage());
+        } catch (Exception e){
+            System.err.println("[ERROR] Initializing the database connection: " + e.getMessage());
             System.exit(1);
         }
 

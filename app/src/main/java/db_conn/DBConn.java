@@ -1,4 +1,8 @@
 package db_conn;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,23 +16,28 @@ public class DBConn{
                 System.out.println("[INFO] Connected to database succesfully");
             else
                 System.out.println("[ERROR] Connected to database unsuccesfully");
-        } catch(SQLException e){
+        } catch(Exception e){
             System.err.println("[ERROR] Testing the database connection: " + e.getMessage());
         }
     }
 
-    // Returns the database connection object(and sets it if needed)
-    public static Connection instance() throws SQLException{
+    // Initializes database connection
+    public static void init() throws SQLException, FileNotFoundException, IOException{
         if (instance == null){
-            String url = "jdbc:mysql://localhost:3306/packet_tracer_2";
-            String user = "root";
-            String password = "REDACTED";
+            BufferedReader conf_file = new BufferedReader(new FileReader("app/src/main/java/db_conn/config.txt"));
+            String url = conf_file.readLine().split(": ")[1];
+            String user = conf_file.readLine().split(": ")[1];
+            String password = conf_file.readLine().split(": ")[1];
             instance = DriverManager.getConnection(url, user, password);
         }
+    }
+
+    // Returns the database connection object
+    public static Connection instance(){
         return instance;
     }
 
-    public static boolean TestConn() throws SQLException{
+    public static boolean TestConn() throws SQLException, IOException{
         Connection inst = instance();
 
         return inst.isValid(2);

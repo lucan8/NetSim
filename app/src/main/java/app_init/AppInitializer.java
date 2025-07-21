@@ -1,6 +1,5 @@
 package app_init;
-import java.sql.SQLException;
-
+import db_conn.DBConn;
 import models.Company;
 import models.Connection;
 import models.Equipment;
@@ -44,7 +43,10 @@ public class AppInitializer{
             routing_table_model = new RoutingTable();
 
             System.out.println("[INFO]: Connecting to and initializing database");
-            // Initialize database
+            // Initialize database conenction
+            DBConn.init();
+            
+            // Create tables if needed
             user_model.create();
             company_model.create();
             equipment_model.create();
@@ -53,7 +55,7 @@ public class AppInitializer{
             packet_model.create();
             mac_addr_table_model.create();
             routing_table_model.create();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
     }
